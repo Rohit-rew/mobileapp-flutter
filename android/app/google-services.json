@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "970511730061",
+    "project_id": "mobiletodo",
+    "storage_bucket": "mobiletodo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970511730061:android:4fbfff7d41f4a9cd5e29c4",
+        "android_client_info": {
+          "package_name": "com.pengodigital.todo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "970511730061-nh4a30heufkch09tbdeg2m3tb36ik8i8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW1QbCYfqgyP0vlXUMXXQMWwAtD64ilIU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "970511730061-nh4a30heufkch09tbdeg2m3tb36ik8i8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "970511730061-169iejqhs6i95ukhi34o8tkk73fqnll8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.pengodigital.todo"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
