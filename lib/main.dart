@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:todo/constants/routes.dart';
 import 'package:todo/views/login_view.dart';
 import 'package:todo/views/register_view.dart';
 import 'package:todo/views/verify_email_view.dart';
@@ -16,9 +17,9 @@ void main() {
     ),
     home: const HomePage(),
     routes: {
-      '/login/': (context) => const LoginView(),
-      '/register/': (context) => const RegisterView(),
-      '/notes/': (context) => const NotesView(),
+      loginRoute: (context) => const LoginView(),
+      registerRoute: (context) => const RegisterView(),
+      notesRoute: (context) => const NotesView(),
     },
   ));
 }
@@ -58,10 +59,10 @@ class NotesView extends StatefulWidget {
   const NotesView({super.key});
 
   @override
-  State<NotesView> createState() => _NotesViesState();
+  State<NotesView> createState() => _NotesViewState();
 }
 
-class _NotesViesState extends State<NotesView> {
+class _NotesViewState extends State<NotesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +77,7 @@ class _NotesViesState extends State<NotesView> {
                   if (shouldLogout) {
                     await FirebaseAuth.instance.signOut();
                     Navigator.of(context)
-                        .pushNamedAndRemoveUntil("/login/", (_) => false);
+                        .pushNamedAndRemoveUntil(loginRoute, (_) => false);
                   }
                   break;
                 case MenueAction.login:
