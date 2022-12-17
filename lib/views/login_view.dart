@@ -1,8 +1,7 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import "package:firebase_auth/firebase_auth.dart";
 import 'package:todo/constants/routes.dart';
-import 'package:todo/firebase_options.dart';
+import 'package:todo/services/auth/auth_enceptions.dart';
+import 'package:todo/services/auth/auth_service.dart';
 
 import '../utilities/showErrorDialog.dart';
 
@@ -58,24 +57,21 @@ class _LoginViewState extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                await AuthService.firebase().logIn(
                   email: email,
                   password: password,
                 );
+
                 Navigator.of(context).pushNamedAndRemoveUntil(
                   notesRoute,
                   (route) => false,
                 );
-              } on FirebaseAuthException catch (e) {
-                if (e.code == "user-not-found") {
-                  await showErrorDialog(context, "User does not exist");
-                } else if (e.code == "wrong-password") {
-                  await showErrorDialog(context, "Incorrect password");
-                } else {
-                  await showErrorDialog(context, 'Error : ${e.code}');
-                }
-              } catch (e) {
-                await showErrorDialog(context, e.toString());
+              } on UserNotFoundAuthException {
+                await showErrorDialog(context, "User does not exist");
+              } on WrongPasswordAuthException {
+                await showErrorDialog(context, "Incorrect password");
+              } on GenericAuthException {
+                await showErrorDialog(context, 'Authentication Error');
               }
             },
             child: const Text("Login"),

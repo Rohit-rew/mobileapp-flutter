@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:todo/firebase_options.dart';
 import 'package:todo/services/auth/auth_user.dart';
 import 'package:todo/services/auth/auth_provider.dart';
 import 'package:todo/services/auth/auth_enceptions.dart';
@@ -28,10 +30,10 @@ class FirebaseAuthProvider implements AuthProvider {
       } else if (e.code == "invalid-email") {
         throw InvalidEmailAuthException();
       } else {
-        throw GenericAUthException();
+        throw GenericAuthException();
       }
     } catch (e) {
-      throw GenericAUthException();
+      throw GenericAuthException();
     }
   }
 
@@ -51,6 +53,8 @@ class FirebaseAuthProvider implements AuthProvider {
     required String password,
   }) async {
     try {
+      print(email);
+      print(password);
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -59,7 +63,7 @@ class FirebaseAuthProvider implements AuthProvider {
       if (user != null) {
         return user;
       } else {
-        throw UserNotLoggedInAUthException();
+        throw UserNotLoggedInAuthException();
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == "user-not-found") {
@@ -67,10 +71,10 @@ class FirebaseAuthProvider implements AuthProvider {
       } else if (e.code == "wrong-password") {
         throw WrongPasswordAuthException();
       } else {
-        throw GenericAUthException();
+        throw GenericAuthException();
       }
     } catch (e) {
-      throw GenericAUthException();
+      throw GenericAuthException();
     }
   }
 
@@ -80,7 +84,7 @@ class FirebaseAuthProvider implements AuthProvider {
     if (user != null) {
       await FirebaseAuth.instance.signOut();
     } else {
-      throw UserNotLoggedInAUthException();
+      throw UserNotLoggedInAuthException();
     }
   }
 
@@ -90,7 +94,13 @@ class FirebaseAuthProvider implements AuthProvider {
     if (user != null) {
       await user.sendEmailVerification();
     } else {
-      throw UserNotLoggedInAUthException();
+      throw UserNotLoggedInAuthException();
     }
+  }
+
+  @override
+  Future<void> initialize() async {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
   }
 }
