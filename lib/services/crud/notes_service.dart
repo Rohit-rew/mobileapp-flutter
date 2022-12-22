@@ -2,29 +2,75 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
+import 'package:todo/services/crud/crud_constants.dart';
 
-class DatabaseAlreadyOpenException implements Exception {}
-
-class UnableToGetDocumentsDirectory implements Exception {}
-
-class DatabaseIsNotOpen implements Exception {}
-
-class CouldNotDeleteUser implements Exception {}
-
-class UserAlreadyExists implements Exception {}
-
-class CouldNotFindUser implements Exception {}
+import 'crud_exceptions.dart';
 
 class NotesService {
   Database? _db;
 
+  Future<DatabaseNote> updateNote(
+      {required DatabaseNote note, required String text}) async {
+    final db = _getDatabaseOrThrow();
+
+    await getNote(id: note.id);
+
+    final updateCount = await db
+        .update(noteTable, {textColumn: text, isSyncedWithCloudColumn: 0});
+
+    if (updateCount == 0) {
+      throw CouldNotUpdateNote();
+    } else {
+      return await getNote(id: note.id);
+    }
+  }
+
+  Future<Iterable<DatabaseNote>> getAllNotes() async {
+    final db = _getDatabaseOrThrow();
+    final notes = await db.query(noteTable);
+
+    if (notes.isEmpty) {
+      throw CouldNotFindNotes();
+    } else {
+      final result = notes.map(
+        (noteRow) => DatabaseNote.fromRow(noteRow),
+      );
+      return result;
+    }
+  }
+
+  Future<DatabaseNote> getNote({required int id}) async {
+    final db = _getDatabaseOrThrow();
+    final notes = await db.query(
+      noteTable,
+      limit: 1,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (notes.isEmpty) {
+      throw CouldNotFindNotes();
+    } else {
+      return DatabaseNote.fromRow(notes.first);
+    }
+  }
+
+  Future<int> deleteAllNotes() async {
+    final db = _getDatabaseOrThrow();
+    return await db.delete(noteTable);
+  }
+
   Future<void> deleteNote({required int id}) async {
     final db = _getDatabaseOrThrow();
-    db.delete(
+    final deletedCount = db.delete(
       noteTable,
       where: 'id = ?',
       whereArgs: [id],
     );
+
+    if (deletedCount == 0) {
+      throw CouldNotDeleteNote();
+    }
   }
 
   Future<DatabaseNote> createNote({required DatabaseUser owner}) async {
@@ -200,27 +246,3 @@ class DatabaseNote {
   @override
   int get hashCode => id.hashCode;
 }
-
-const dbName = 'notes.db';
-const noteTable = 'note';
-const userTable = 'user';
-const idColumn = 'id';
-const emailColumn = 'email';
-const userIdColumn = "user_id";
-const textColumn = 'text';
-const isSyncedWithCloudColumn = 'is_synced_with_cloud';
-
-const createUsertable = '''CREATE TABLE IF NOT EXISTS "user" (
-        "id"	INTEGER NOT NULL,
-        "email"	TEXT NOT NULL UNIQUE,
-        PRIMARY KEY("id" AUTOINCREMENT)
-      );''';
-
-const createNoteTable = '''CREATE TABLE IF NOT EXISTS "note" (
-        "id"	INTEGER NOT NULL,
-        "user_id"	INTEGER NOT NULL,
-        "text"	TEXT,
-        "isSynced_withCloud"	INTEGER NOT NULL DEFAULT 0,
-        FOREIGN KEY("user_id") REFERENCES "user"("id"),
-        PRIMARY KEY("id" AUTOINCREMENT)
-      );''';
